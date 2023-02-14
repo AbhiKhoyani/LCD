@@ -9,6 +9,7 @@ aux-figs/
 results/
 run-configs/
 test.sh
+simple-job.sh
 
 ###########
 ### VIM ###
