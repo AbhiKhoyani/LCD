@@ -18,12 +18,12 @@ def load_dataset(name = None, URL = './Datasets'):
     assert os.path.isdir(URL), "Invalid BASE_DIR provided"
 
     root_dir = os.path.join(URL, name)
-    image_path = os.path.join(root_dir, 'Image', 'Image')
+    image_path = os.path.join(root_dir, 'Image')
     if not os.path.isdir(root_dir):
         print('Downloading Dataset....')
         makedirs(root_dir)
         extract_zip(os.path.join(URL, name+'.zip'), root_dir)
-        extract_zip(os.path.join(URL, name, 'Image.zip'), os.path.join(image_path))
+        extract_zip(os.path.join(URL, name, 'Image.zip'), root_dir)
         print('Downloading Finished....')
 
     gt = loadmat(os.path.join(root_dir, 'gt.mat'))['truth'].astype(bool)    #storing it in boolean for memory saving
