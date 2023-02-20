@@ -71,87 +71,88 @@ class MODELS:
     
     def load_model(self, name):
         default = self.resnet
+        print(f'Loading model: {name}')
         return getattr(self, name, lambda: default)()
 
     def alexnet(self):
-        from torchvision.models import AlexNet
-        return AlexNet(weights = 'DEFAULT')
+        from torchvision.models import alexnet
+        return alexnet(weights = 'DEFAULT')
 
     def convnext(self):
-        from torchvision.models import ConvNeXt
-        return ConvNeXt(weights = 'DEFAULT')
+        from torchvision.models import convnext_base
+        return convnext_base(weights = 'DEFAULT')
 
     def densenet(self):
-        from torchvision.models import DenseNet
-        return DenseNet(weights = 'DEFAULT')
+        from torchvision.models import densenet161
+        return densenet161(weights = 'DEFAULT')
 
     def efficientnet(self):
-        from torchvision.models import EfficientNet
-        return EfficientNet(weights = 'DEFAULT')
+        from torchvision.models import efficientnet_b6
+        return efficientnet_b6(weights = 'DEFAULT')
 
     def efficientnetv2(self):
-        from torchvision.models import efficientnet_v2_l
-        return efficientnet_v2_l(weights = 'DEFAULT')
+        from torchvision.models import efficientnet_v2_m
+        return efficientnet_v2_m(weights = 'DEFAULT')
 
     def googlenet(self):
-        from torchvision.models import GoogLeNet
-        return GoogLeNet(weights = 'DEFAULT')
+        from torchvision.models import googlenet
+        return googlenet(weights = 'DEFAULT')
 
     def inceptionv3(self):
-        from torchvision.models import Inception3
-        return Inception3(weights = 'DEFAULT')
+        from torchvision.models import inception_v3
+        return inception_v3(weights = 'DEFAULT')
 
     def maxvit(self):
-        from torchvision.models import MaxVit
-        return MaxVit(weights = 'DEFAULT')
+        from torchvision.models import maxvit_t
+        return maxvit_t(weights = 'DEFAULT')
 
     def mnasnet(self):
-        from torchvision.models import MNASNet
-        return MNASNet(weights = 'DEFAULT')
+        from torchvision.models import mnasnet1_3
+        return mnasnet1_3(weights = 'DEFAULT')
 
     def mobilenetv2(self):
-        from torchvision.models import MobileNetV2
-        return MobileNetV2(weights = 'DEFAULT')
+        from torchvision.models import mobilenet_v2
+        return mobilenet_v2(weights = 'DEFAULT')
 
     def mobilenetv3(self):
-        from torchvision.models import MobileNetV3
-        return MobileNetV3(weights = 'DEFAULT')
+        from torchvision.models import mobilenet_v3_large
+        return mobilenet_v3_large(weights = 'DEFAULT')
 
     def regnet(self):
-        from torchvision.models import RegNet
-        return RegNet(weights = 'DEFAULT')
+        from torchvision.models import regnet_y_32gf
+        return regnet_y_32gf(weights = 'DEFAULT')
     
     def resnet(self):
         from torchvision.models import resnet50
         return resnet50(weights = 'IMAGENET1K_V2')
         
     def resnext(self):
-        from torchvision.models import resnext50_32x4d
-        return resnext50_32x4d(weights = 'DEFAULT')
+        from torchvision.models import resnext101_64x4d
+        return resnext101_64x4d(weights = 'DEFAULT')
 
     def shufflenetv2(self):
-        from torchvision.models import ShuffleNetV2
-        return ShuffleNetV2(weights = 'DEFAULT')
+        from torchvision.models import shufflenet_v2_x2_0
+        return shufflenet_v2_x2_0(weights = 'DEFAULT')
 
     def squeezenet(self):
-        from torchvision.models import SqueezeNet
-        return SqueezeNet(weights = 'DEFAULT')
+        from torchvision.models import squeezenet1_1
+        return squeezenet1_1(weights = 'DEFAULT')
 
     def swin(self):
-        from torchvision.models import SwinTransformer
-        return SwinTransformer(weights = 'DEFAULT')
+        from torchvision.models import swin_v2_s
+        return swin_v2_s(weights = 'DEFAULT')
 
     def vgg(self):
-        from torchvision.models import vgg19
-        return vgg19(weights = 'DEFAULT')
+        from torchvision.models import vgg16_bn
+        return vgg16_bn(weights = 'DEFAULT')
 
     def vit(self):
-        from torchvision.models import VisionTransformer
-        return VisionTransformer(weights = 'DEFAULT')
+        from torchvision.models import vit_b_16
+        return vit_b_16(weights = 'DEFAULT')
 
     def wideresnet(self):
-        from torchvision.models import wide_resnet50_2
-        return wide_resnet50_2(weights = 'DEFAULT')
+        from torchvision.models import wide_resnet101_2
+        return wide_resnet101_2(weights = 'DEFAULT')
 
 
 class customGraph(Data):

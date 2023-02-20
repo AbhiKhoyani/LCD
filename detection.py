@@ -31,26 +31,27 @@ def pass_args():
     argparser = argparse.ArgumentParser(description='Loop closing daataset & model details')
     argparser.add_argument("--project_name", type=str, default = default_config.project_name, help='Project name to log data in W&B.')
     argparser.add_argument("--dataset_name", type=str, default = default_config.dataset_name, help='Dataset to load.',
-                            choices= ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTY_00', 'KITTY_05',
-                                        'KAIST_NORTH','KAIST_EAST','KAIST_WEST'])
+                            choices= ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTI_00', 'KITTI_05',
+                                        'KAIST_NORTH','KAIST_EAST','KAIST_WEST'])       #9
     argparser.add_argument("--model_name", type=str, default = default_config.model_name, help='Model to use for LCD.',
                             choices=['AlexNet', "ConvNext", "DenseNet", "EfficientNet", "EfficientNetV2",
                                         "GoogLeNet", "InceptionV3", "MaxVit", "MNASNet", "MobileNetV2", "MobileNetV3",
-                                        "RegNet", "ResNet", "ResNeXt", "ShuffleNetV2", "SqueezeNet", "ShuffleNetV2",
-                                        "SWIN", "VGG", "ViT", "WideResNet"])
+                                        "RegNet", "ResNet", "ResNeXt", "ShuffleNetV2", "SqueezeNet",
+                                        "SWIN", "VGG", "ViT", "WideResNet"])            #20
     argparser.add_argument("--weights", type=str, default = default_config.weights, help='Weight path/name to load on model.')  #ignoring for now
+    args = argparser.parse_args()
+    vars(default_config).update(vars(args))
 
 
-def train(config):
-    
+def train(config):    
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    
     ######################################################################################
     # Download dataset & extract features
     load_dataset(name = config.dataset_name)
-    run = wandb.init(project = config.project_name, entity = "abhi_khoyani", config = config)
+    run = wandb.init(project = config.project_name, entity = "abhi_khoyani", config = config,
+                         name=config.model_name)
 
-    
     root_dir = os.path.join('./Datasets', config.dataset_name)
     image_path = os.path.join(root_dir, 'Image')
     gt = loadmat(os.path.join(root_dir, 'gt.mat'))['truth'].astype(bool)    #storing it in boolean for memory saving
@@ -121,16 +122,16 @@ def train(config):
 
 def load_dataset(name = None, URL = './Datasets'):
 
-    all_dataset = ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTY_00', 'KITTY_05',
+    all_dataset = ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTI_00', 'KITTI_05',
                 'KAIST_NORTH','KAIST_EAST','KAIST_WEST']
-    assert name in all_dataset, """Supported dataset are ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTY_00', 'KITTY_05',
+    assert name in all_dataset, """Supported dataset are ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTI_00', 'KITTI_05',
                                             'KAIST_NORTH','KAIST_EAST','KAIST_WEST']"""
 
     assert os.path.isdir(URL), "Invalid BASE_DIR provided"
 
     root_dir = os.path.join(URL, name)
     if not os.path.isdir(root_dir):
-        print('Downloading Dataset....')
+        print('Downloading Dataset....',name)
         makedirs(root_dir)
         extract_zip(os.path.join(URL, name+'.zip'), root_dir)
         extract_zip(os.path.join(URL, name, 'Image.zip'), root_dir)

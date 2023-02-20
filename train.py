@@ -30,7 +30,8 @@ def pass_args():
                                         "RegNet", "ResNet", "ResNeXt", "ShuffleNetV2", "SqueezeNet", "ShuffleNetV2",
                                         "SWIN", "VGG", "ViT", "WideResNet"])
     argparser.add_argument("--weights", type=str, default = default_config.weights, help='Weight path/name to load on model.')  #ignoring for now
-
+    args = argparser.parse_args()
+    vars(default_config).update(vars(args))
 
 def train(config):
     
@@ -41,7 +42,7 @@ def train(config):
     mx = Matcher()
     model = LoopClosureDetector(fx, mx)
 
-    run = wandb.init(project = config.project_name, entity = "abhi_khoyani", config = config)
+    run = wandb.init(project = config.project_name, entity = "abhi_khoyani", config = config, name = config.dataset_name)
     #all data to gpu
     # data = data.to(device)
     # model = model.eval().to(device)
