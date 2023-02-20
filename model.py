@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from torchvision import transforms, utils
+from torchvision import utils
 from torchvision.models.feature_extraction import create_feature_extractor
 from typing import Union, List, Optional
 from torch_geometric.typing import OptTensor
@@ -24,19 +24,20 @@ class FeatureExtractor(torch.nn.Module):
                         "SWIN", "VGG", "ViT", "WideResNet"]"""
         
         #Feature extractor 
-        self.fx_base = self.load_model(name, weights)     #resnet50(weights = 'IMAGENET1K_V2')       #feature extractor model
+        self.fx, self.transforms = self.load_model(name, weights)     #resnet50(weights = 'IMAGENET1K_V2')       #feature extractor model
         
-        for param in self.fx_base.parameters():
+        for param in self.fx.parameters():
             param.requires_grad = False   #so that with torch.no_grad is not required
-        self.fx_required = {'flatten':'flatten'}        #required layers from all the get_graph_node_names(m)
-        self.fx = create_feature_extractor(self.fx_base, return_nodes=self.fx_required)       #last dense layer
+        # self.fx_required = {'flatten':'flatten'}        #required layers from all the get_graph_node_names(m)
+        # self.fx = create_feature_extractor(self.fx_base, return_nodes=self.fx_required)       #last dense layer
 
     def load_model(self, name, weights = None):
         m = MODELS()
-        return m.load_model(name)
+        return m.load_model(name, weights)
 
     def forward(self, x):
-        return self.fx(x)['flatten']
+        x = self.transforms(x)
+        return self.fx(x)['out']
 
 class Matcher(torch.nn.Module):
     '''
@@ -69,124 +70,162 @@ class LoopClosureDetector(torch.nn.Module):
     
 class MODELS:
     
-    def load_model(self, name):
+    def load_model(self, name, weights):
         default = self.resnet
         print(f'Loading model: {name}')
         return getattr(self, name, lambda: default)()
 
     def alexnet(self):
-        from torchvision.models import alexnet
+        from torchvision.models import alexnet, AlexNet_Weights
         fx_required = {'flatten':'out'}
-        base = alexnet(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = AlexNet_Weights.DEFAULT
+        base = alexnet(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def convnext(self):
-        from torchvision.models import convnext_base
+        from torchvision.models import convnext_base, ConvNeXt_Base_Weights
         fx_required = {'classifier.1':'out'}
-        base = convnext_base(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = ConvNeXt_Base_Weights.DEFAULT
+        base = convnext_base(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def densenet(self):
-        from torchvision.models import densenet161
+        from torchvision.models import densenet161, DenseNet161_Weights
         fx_required = {'flatten':'out'}
-        base = densenet161(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = DenseNet161_Weights.DEFAULT
+        base = densenet161(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def efficientnet(self):
-        from torchvision.models import efficientnet_b6
+        from torchvision.models import efficientnet_b6, EfficientNet_B6_Weights
         fx_required = {'flatten':'out'}
-        base = efficientnet_b6(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = EfficientNet_B6_Weights.DEFAULT
+        base = efficientnet_b6(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def googlenet(self):
-        from torchvision.models import googlenet
+        from torchvision.models import googlenet, GoogLeNet_Weights
         fx_required = {'flatten':'out'}
-        base = googlenet(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = GoogLeNet_Weights.DEFAULT
+        base = googlenet(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def inceptionv3(self):
-        from torchvision.models import inception_v3
+        from torchvision.models import inception_v3, Inception_V3_Weights
         fx_required = {'flatten':'out'}
-        base = inception_v3(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = Inception_V3_Weights.DEFAULT
+        base = inception_v3(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def maxvit(self):
-        from torchvision.models import maxvit_t
-        fx_required = {'flatten':'out'}
-        base = maxvit_t(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        from torchvision.models import maxvit_t, MaxVit_T_Weights
+        fx_required = {'classifier.5':'out'}
+        weights = MaxVit_T_Weights.DEFAULT
+        base = maxvit_t(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def mnasnet(self):
-        from torchvision.models import mnasnet1_3
+        from torchvision.models import mnasnet1_3, MNASNet1_3_Weights
         fx_required = {'mean':'out'}
-        base = mnasnet1_3(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = MNASNet1_3_Weights.DEFAULT
+        base = mnasnet1_3(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def mobilenetv2(self):
-        from torchvision.models import mobilenet_v2
+        from torchvision.models import mobilenet_v2, MobileNet_V2_Weights
         fx_required = {'flatten':'out'}
-        base = mobilenet_v2(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = MobileNet_V2_Weights.DEFAULT
+        base = mobilenet_v2(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def mobilenetv3(self):
-        from torchvision.models import mobilenet_v3_large
+        from torchvision.models import mobilenet_v3_large, MobileNet_V3_Large_Weights
         fx_required = {'flatten':'out'}
-        base = mobilenet_v3_large(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = MobileNet_V3_Large_Weights.DEFAULT
+        base = mobilenet_v3_large(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def regnet(self):
-        from torchvision.models import regnet_y_32gf
+        from torchvision.models import regnet_y_32gf, RegNet_Y_32GF_Weights
         fx_required = {'flatten':'out'}
-        base = regnet_y_32gf(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = RegNet_Y_32GF_Weights.DEFAULT
+        base = regnet_y_32gf(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
     
     def resnet(self):
-        from torchvision.models import resnet50
+        from torchvision.models import resnet50, ResNet50_Weights
         fx_required = {'flatten':'out'}
+        weights = ResNet50_Weights.DEFAULT
         base = resnet50(weights = 'IMAGENET1K_V2')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
         
     def resnext(self):
-        from torchvision.models import resnext101_64x4d
+        from torchvision.models import resnext101_64x4d, ResNeXt101_64X4D_Weights
         fx_required = {'flatten':'out'}
-        base = resnext101_64x4d(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = ResNeXt101_64X4D_Weights.DEFAULT
+        base = resnext101_64x4d(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def shufflenetv2(self):
-        from torchvision.models import shufflenet_v2_x2_0
+        from torchvision.models import shufflenet_v2_x2_0, ShuffleNet_V2_X2_0_Weights
         fx_required = {'mean':'out'}
-        base = shufflenet_v2_x2_0(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = ShuffleNet_V2_X2_0_Weights.DEFAULT
+        base = shufflenet_v2_x2_0(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def squeezenet(self):
-        from torchvision.models import squeezenet1_1
+        from torchvision.models import squeezenet1_1, SqueezeNet1_1_Weights
         fx_required = {'flatten':'out'}
-        base = squeezenet1_1(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = SqueezeNet1_1_Weights.DEFAULT
+        base = squeezenet1_1(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def swin(self):
-        from torchvision.models import swin_v2_s
+        from torchvision.models import swin_v2_s, Swin_V2_S_Weights
         fx_required = {'flatten':'out'}
-        base = swin_v2_s(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = Swin_V2_S_Weights.DEFAULT
+        base = swin_v2_s(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def vgg(self):
-        from torchvision.models import vgg16_bn
+        from torchvision.models import vgg16_bn, VGG16_BN_Weights
         fx_required = {'flatten':'out'}
-        base = vgg16_bn(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = VGG16_BN_Weights.DEFAULT
+        base = vgg16_bn(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def vit(self):
-        from torchvision.models import vit_b_16
+        from torchvision.models import vit_b_16, ViT_B_16_Weights
         fx_required = {'getitem_5':'out'}
-        base = vit_b_16(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = ViT_B_16_Weights.DEFAULT
+        base = vit_b_16(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
     def wideresnet(self):
-        from torchvision.models import wide_resnet101_2
+        from torchvision.models import wide_resnet101_2, Wide_ResNet101_2_Weights
         fx_required = {'flatten':'out'}
-        base = wide_resnet101_2(weights = 'DEFAULT')
-        return create_feature_extractor(base, return_nodes=fx_required)
+        weights = Wide_ResNet101_2_Weights.DEFAULT
+        base = wide_resnet101_2(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
 
 
 class customGraph(Data):
