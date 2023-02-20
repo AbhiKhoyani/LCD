@@ -32,7 +32,7 @@ def pass_args():
     argparser.add_argument("--project_name", type=str, default = default_config.project_name, help='Project name to log data in W&B.')
     argparser.add_argument("--dataset_name", type=str, default = default_config.dataset_name, help='Dataset to load.',
                             choices= ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTI_00', 'KITTI_05',
-                                        'KAIST_NORTH','KAIST_EAST','KAIST_WEST'])       #9
+                                        'KAIST_North','KAIST_East','KAIST_West'])       #9
     argparser.add_argument("--model_name", type=str, default = default_config.model_name, help='Model to use for LCD.',
                             choices=['AlexNet', "ConvNext", "DenseNet", "EfficientNet", "EfficientNetV2",
                                         "GoogLeNet", "InceptionV3", "MaxVit", "MNASNet", "MobileNetV2", "MobileNetV3",
@@ -123,9 +123,9 @@ def train(config):
 def load_dataset(name = None, URL = './Datasets'):
 
     all_dataset = ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTI_00', 'KITTI_05',
-                'KAIST_NORTH','KAIST_EAST','KAIST_WEST']
+                                            'KAIST_North','KAIST_East','KAIST_West']
     assert name in all_dataset, """Supported dataset are ['CC_orig', 'NC_orig', 'CC_reduced', 'NC_reduced', 'KITTI_00', 'KITTI_05',
-                                            'KAIST_NORTH','KAIST_EAST','KAIST_WEST']"""
+                                            'KAIST_North','KAIST_East','KAIST_West']"""
 
     assert os.path.isdir(URL), "Invalid BASE_DIR provided"
 

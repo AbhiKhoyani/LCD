@@ -107,6 +107,14 @@ class MODELS:
         transforms = weights.transforms()
         return create_feature_extractor(base, return_nodes=fx_required), transforms
 
+    def efficientnetv2(self):
+        from torchvision.models import efficientnet_v2_m, EfficientNet_V2_M_Weights
+        fx_required = {'flatten':'out'}
+        weights = EfficientNet_V2_M_Weights.DEFAULT
+        base = efficientnet_v2_m(weights = weights)
+        transforms = weights.transforms()
+        return create_feature_extractor(base, return_nodes=fx_required), transforms
+
     def googlenet(self):
         from torchvision.models import googlenet, GoogLeNet_Weights
         fx_required = {'flatten':'out'}
