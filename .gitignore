@@ -1,6 +1,7 @@
 Datasets/
 wandb/
 logs/
+data/
 weights/
 assets/
 install/
