@@ -9,6 +9,6 @@ def dense_matrics(edge_index, data = None):
     if data is None:
         data = np.ones(u.shape, dtype=np.int8)
     u, v = edge_index
-    n = len(np.unique(u)) + 1
+    n = len(np.unique(u))
     m = coo_matrix((data, (u, v)), shape  = (n,n))
     return m.toarray()
