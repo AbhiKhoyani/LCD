@@ -65,7 +65,11 @@ def train(config):
     root_dir = os.path.join('./Datasets', config.dataset_name)
     image_path = os.path.join(root_dir, 'Image')
     gt = loadmat(os.path.join(root_dir, 'gt.mat'))['truth'].astype(bool)    #storing it in boolean for memory saving
-    gt = gt #+ gt.T
+    
+    if config.dataset_name in ['CC_orig', 'NC_orig', 'KITTI_00', 'KITTI_05']:
+        gt = gt.T + np.eye(len(gt), dtype = np.bool_)
+    # else:
+    #     gt = gt #+ gt.T
 
     dataset = ImageFolderDataset(image_path)
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=4) 
@@ -94,21 +98,25 @@ def train(config):
     end_time = time.perf_counter()
 
         
-    #logging gt & pred in confusion matrix form
+    # logging gt & pred in confusion matrix form
     # plt.imshow(gt)
     # wandb.log({"Ground Truth": wandb.Image(dense_matrics(edge_index, gt))})
     wandb.log({"Ground Truth": wandb.Image(gt)})
     # plt.imshow(pred)
     wandb.log({"Prediction": wandb.Image(pred*255)})
 
-    precision, recall, _ = precision_recall_curve(gt.flatten(), pred.flatten())
+    # mask for upper triangle to consider only valid values and ignoring all zeros
+    mask = np.triu(np.ones((len(gt), len(gt)))).astype(np.bool_)  
+    pred = pred[mask]
+    gt = gt[mask]
+    precision, recall, _ = precision_recall_curve(gt, pred)
     wandb.run.summary['PR @ Recall_0'] = max(precision[recall == 0])
     wandb.run.summary['Recall @ Pr_100'] = max(recall[precision == 1])
 
-    #evaluation
-    gt = np.expand_dims(gt.flatten(), -1)
-    pred = np.expand_dims(pred.flatten(), -1)
-    pred =  np.vstack([1 - pred[:,0], pred[:,0]]).T
+    # evaluation
+    gt = np.expand_dims(gt, -1)
+    pred = np.expand_dims(pred, -1)
+    pred = np.vstack([1 - pred[:,0], pred[:,0]]).T
     wandb.log({"PR curve":wandb.plot.pr_curve(gt, pred, labels = [0,1])})
     wandb.run.summary['Total time'] = end_time - start_time
     
