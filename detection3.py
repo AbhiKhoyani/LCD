@@ -30,7 +30,7 @@ from sklearn.metrics import precision_recall_curve
 from utils import dense_matrics
 
 default_config = SimpleNamespace(
-    project_name = 'Test',
+    project_name = 'LCD',
     dataset_name = 'NC_reduced',
     model_name = 'ResNet',
     weights = 'default'
