@@ -2,7 +2,7 @@ import numpy as np
 from scipy.sparse import coo_matrix
 
 
-def dense_edge(edge_index, data = None):
+def dense_matrics(edge_index, data = None):
     assert edge_index.ndim ==2
     assert edge_index.shape[0] == 2
 

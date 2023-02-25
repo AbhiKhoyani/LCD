@@ -243,8 +243,8 @@ class customGraph(Data):
             x = torch.tensor([])
             edge_index = torch.tensor([[],[]])
             # edge_attr = torch.tensor([])
-        
-        super().__init__(x, edge_index, edge_attr, y, pos, **kwargs)
+            node_id = []
+        super().__init__(x, edge_index, edge_attr, y, pos, node_id = node_id, **kwargs)
         
     @property
     def num_nodes(self) -> Optional[int]:
