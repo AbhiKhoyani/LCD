@@ -30,7 +30,7 @@ from sklearn.metrics import precision_recall_curve
 from utils import dense_matrics
 
 default_config = SimpleNamespace(
-    project_name = 'LCD',
+    project_name = 'Test',
     dataset_name = 'NC_reduced',
     model_name = 'ResNet',
     weights = 'default'
@@ -164,4 +164,3 @@ class ImageFolderDataset(Dataset):
 if __name__ == "__main__":
     pass_args()
     train(default_config)
-
