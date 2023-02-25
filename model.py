@@ -239,6 +239,11 @@ class MODELS:
 class customGraph(Data):
 
     def __init__(self, x: OptTensor = None, edge_index: OptTensor = None, edge_attr: OptTensor = None, y: OptTensor = None, pos: OptTensor = None, **kwargs):
+        if x is None:
+            x = torch.tensor([])
+            edge_index = torch.tensor([[],[]])
+            # edge_attr = torch.tensor([])
+        
         super().__init__(x, edge_index, edge_attr, y, pos, **kwargs)
         
     @property
@@ -252,28 +257,28 @@ class customGraph(Data):
     def add_node(self, x:OptTensor, edges: Union[List, None] = None, edge_attr: Union[List, None] = None,
                  pos: OptTensor = None):
         
-        if self.num_nodes == 0:
-            '''
-            Intializing graph from the beginning.
-            '''
-            assert edges == None, "New Graph initializing from single node can't have edges."
-            node_id = self.num_nodes
-            self.x = x
-            self.node_id = [node_id]
-        else:
-            node_id = self.num_nodes
-            self.x = torch.cat((self.x, x))
-            self.node_id.append(node_id)
+        # if self.num_nodes == 0:
+        #     '''
+        #     Intializing graph from the beginning.
+        #     '''
+        #     assert edges == None, "New Graph initializing from single node can't have edges."
+        #     node_id = self.num_nodes
+        #     self.x = x
+        #     self.node_id = [node_id]
+        # else:
+        node_id = self.num_nodes
+        self.x = torch.cat((self.x, x))
+        self.node_id.append(node_id)
 
-            if edges!=None and edge_attr!=None:
-                no_edges = len(edges)
-                assert (torch.tensor(edges) < self.num_nodes).all, "Only Existing node edges can be added."
-                u = [node_id]*no_edges
-                
-                #add edges
-                edges = torch.tensor(np.array([u,edges]), dtype = torch.long)
-                edge_attr = torch.tensor(np.array(edge_attr).reshape(-1,1))
-                return self.add_edge(edges, edge_attr)
+        if edges!=None and edge_attr!=None:
+            no_edges = len(edges)
+            assert (torch.tensor(edges) < self.num_nodes).all, "Only Existing node edges can be added."
+            u = [node_id]*no_edges
+            
+            #add edges
+            edges = torch.tensor(np.array([u,edges]), dtype = torch.long)
+            edge_attr = torch.tensor(np.array(edge_attr).reshape(-1,1))
+            return self.add_edge(edges, edge_attr)
         return True    
 
     def add_edge(self, edge_index, edge_attr):
@@ -285,7 +290,7 @@ class customGraph(Data):
         # add edge attr
         assert edge_index.ndim == 2
         assert edge_attr.shape[0] == edge_index.shape[1]        #match number of nodes
-        if self.edge_attr!=None:
+        if self.edge_attr!=None and self.edge_attr is not None:
             assert edge_attr.shape[1] == self.edge_attr.shape[1]
             self.edge_attr = torch.cat((self.edge_attr, edge_attr))
         else:

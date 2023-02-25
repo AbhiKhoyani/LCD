@@ -1,3 +1,12 @@
+'''
+This code first extract features of all images and prepare graph and then loads neighbor of each nodes
+one by one, by considering time-constraints, means only nodes seen before active nodes will be loaded only.
+To simulate actual scenario that we dont have information of future nodes available.
+
+After the completion, we'll get half traingle only in predictions so, adding transpose with it to get full
+square confusion matrix.
+'''
+
 import os
 import time
 import wandb
@@ -118,7 +127,7 @@ def train(config):
     source = np.concatenate(source)
     dest = np.concatenate(dest)
     pred = dense_matrics(np.array((source, dest)), predictions)
-    pred = (pred + pred.T)/2
+    pred = (pred + pred.T) - np.eye(len(pred))
 
     #closing timer
     end_time = time.perf_counter()
