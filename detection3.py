@@ -167,4 +167,3 @@ class ImageFolderDataset(Dataset):
 if __name__ == "__main__":
     pass_args()
     train(default_config)
-

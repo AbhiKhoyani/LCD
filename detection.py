@@ -55,7 +55,7 @@ def train(config):
     root_dir = os.path.join('./Datasets', config.dataset_name)
     image_path = os.path.join(root_dir, 'Image')
     gt = loadmat(os.path.join(root_dir, 'gt.mat'))['truth'].astype(bool)    #storing it in boolean for memory saving
-    gt = gt + gt.T
+    gt = gt + gt.T + np.eye(len(gt))
 
     dataset = ImageFolderDataset(image_path)
     dataloader = DataLoader(dataset, batch_size=32, shuffle=False, num_workers=4) 
