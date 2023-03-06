@@ -46,6 +46,8 @@ class Matcher(torch.nn.Module):
     def forward(self, n1, n2, edge_index = None):
         # n1 = n1[edge_index[0]]
         # n2 = n2[edge_index[1]]
+        n1 = n1.flatten(start_dim = 1) if n1.ndim>2 else n1
+        n2 = n2.flatten(start_dim = 1) if n2.ndim>2 else n2
         return (n1 @ n2.t()) / (torch.norm(n1, dim =-1).unsqueeze(-1) @ torch.norm(n2, dim =-1).unsqueeze(-1).t())
 
 
@@ -173,9 +175,9 @@ class MODELS:
     
     def resnet(self):
         from torchvision.models import resnet50, ResNet50_Weights
-        fx_required = {'flatten':'out'}
+        fx_required = {'avgpool':'out'}
         weights = ResNet50_Weights.DEFAULT
-        base = resnet50(weights = 'IMAGENET1K_V2')
+        base = resnet50(weights = weights)
         transforms = weights.transforms()
         return create_feature_extractor(base, return_nodes=fx_required), transforms
         
@@ -189,7 +191,7 @@ class MODELS:
 
     def shufflenetv2(self):
         from torchvision.models import shufflenet_v2_x2_0, ShuffleNet_V2_X2_0_Weights
-        fx_required = {'mean':'out'}
+        fx_required = {'stage3.7.view_1':'out'} #'mean'
         weights = ShuffleNet_V2_X2_0_Weights.DEFAULT
         base = shufflenet_v2_x2_0(weights = weights)
         transforms = weights.transforms()

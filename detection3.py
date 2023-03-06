@@ -26,13 +26,13 @@ from torch_geometric.data import makedirs, extract_zip
 # from torch.profiler import profile, ProfilerActivity
 from torch.utils.data import Dataset, DataLoader
 from model import FeatureExtractor, Matcher, customGraph
-from sklearn.metrics import precision_recall_curve
+from sklearn.metrics import precision_recall_curve, auc, average_precision_score
 from utils import dense_matrics
 
 default_config = SimpleNamespace(
     project_name = 'Test',
     dataset_name = 'NC_reduced',
-    model_name = 'ResNet',
+    model_name = 'ShuffleNetV2',
     weights = 'default'
 )
 
@@ -110,6 +110,8 @@ def train(config):
     pred = pred[mask]
     gt = gt[mask]
     precision, recall, _ = precision_recall_curve(gt, pred)
+    wandb.run.summary['AUC'] = auc(recall, precision)
+    wandb.run.summary['Avg PR'] = average_precision_score(gt, pred)
     wandb.run.summary['PR @ Recall_0'] = max(precision[recall == 0])
     wandb.run.summary['Recall @ Pr_100'] = max(recall[precision == 1])
 
@@ -119,6 +121,7 @@ def train(config):
     pred = np.vstack([1 - pred[:,0], pred[:,0]]).T
     wandb.log({"PR curve":wandb.plot.pr_curve(gt, pred, labels = [0,1])})
     wandb.run.summary['Total time'] = end_time - start_time
+    wandb.run.summary['FPS'] = len(gt)/(end_time - start_time)
     
 
 
